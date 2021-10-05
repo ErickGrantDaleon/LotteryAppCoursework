@@ -3,9 +3,6 @@ from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import Required, Email, ValidationError, Length, EqualTo
 import re
 
-# TODO: PIN Key must be exactly 32 characters in length.
-# TODO: Relevant validation error messages must be shown.
-
 def character_check(form,field):
     excluded_chars = "*?!'^+%&/()=}][{$#@<>"
     for char in field.data:
