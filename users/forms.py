@@ -1,9 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import Required, Email, ValidationError, Length
+from wtforms.validators import Required, Email, ValidationError, Length, EqualTo
 import re
 
-# TODO: Password and Confirm Password must match.
 # TODO: PIN Key must be exactly 32 characters in length.
 # TODO: Relevant validation error messages must be shown.
 
@@ -27,7 +26,8 @@ class RegisterForm(FlaskForm):
     phone = StringField(validators=[Required(), phone_check])
     password = PasswordField(validators=[Required(), Length(min=6, max=12, message='Password must be between 6 and '
                                                                                    '12 characters long.')])
-    confirm_password = PasswordField(validators=[Required()])
+    confirm_password = PasswordField(validators=[Required(), EqualTo('password', message='Both password fields '
+                                                                                        'must be equal!')])
     pin_key = StringField(validators=[Required()])
     submit = SubmitField()
 
