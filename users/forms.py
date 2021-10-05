@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import Required
+from wtforms.validators import Required, Email
 
-# TODO: Email must be a valid email address.
 # TODO: Firstname and Lastname must not contain the following characters:  * ? ! ' ^ + % & / ( ) = } ] [ { $ # @ < >
 # TODO: Phone must be of the form XXXX-XXX-XXXX
 # TODO: Password must be between 6 and 12 characters in length.
@@ -12,7 +11,7 @@ from wtforms.validators import Required
 # TODO: Relevant validation error messages must be shown.
 
 class RegisterForm(FlaskForm):
-    email = StringField(validators=[Required()])
+    email = StringField(validators=[Required(), Email()])
     firstname = StringField(validators=[Required()])
     lastname = StringField(validators=[Required()])
     phone = StringField(validators=[Required()])
