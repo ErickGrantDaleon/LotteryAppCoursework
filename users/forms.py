@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import Required, Email
+from wtforms.validators import Required, Email, ValidationError
 
-# TODO: Firstname and Lastname must not contain the following characters:  * ? ! ' ^ + % & / ( ) = } ] [ { $ # @ < >
 # TODO: Phone must be of the form XXXX-XXX-XXXX
 # TODO: Password must be between 6 and 12 characters in length.
 # TODO: Password must contain at least 1 digit, 1 lowercase, 1 uppercase and 1 special character.
@@ -10,10 +9,17 @@ from wtforms.validators import Required, Email
 # TODO: PIN Key must be exactly 32 characters in length.
 # TODO: Relevant validation error messages must be shown.
 
+def character_check(form,field):
+    excluded_chars = "*?!'^+%&/()=}][{$#@<>"
+    for char in field.data:
+        if char in excluded_chars:
+            raise ValidationError(
+                f"Character {char} is not allowed.")
+
 class RegisterForm(FlaskForm):
     email = StringField(validators=[Required(), Email()])
-    firstname = StringField(validators=[Required()])
-    lastname = StringField(validators=[Required()])
+    firstname = StringField(validators=[Required(), character_check])
+    lastname = StringField(validators=[Required(), character_check])
     phone = StringField(validators=[Required()])
     password = PasswordField(validators=[Required()])
     confirm_password = PasswordField(validators=[Required()])
