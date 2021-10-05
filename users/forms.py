@@ -2,7 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import Required, Email, ValidationError, Length
 
-# TODO: Password must be between 6 and 12 characters in length.
 # TODO: Password must contain at least 1 digit, 1 lowercase, 1 uppercase and 1 special character.
 # TODO: Password and Confirm Password must match.
 # TODO: PIN Key must be exactly 32 characters in length.
@@ -26,7 +25,8 @@ class RegisterForm(FlaskForm):
     firstname = StringField(validators=[Required(), character_check])
     lastname = StringField(validators=[Required(), character_check])
     phone = StringField(validators=[Required(), phone_check])
-    password = PasswordField(validators=[Required()])
+    password = PasswordField(validators=[Required(), Length(min=6, max=12, message='Password must be between 6 and '
+                                                                                   '12 characters long.')])
     confirm_password = PasswordField(validators=[Required()])
     pin_key = StringField(validators=[Required()])
     submit = SubmitField()
