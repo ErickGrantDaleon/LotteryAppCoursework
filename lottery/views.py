@@ -75,6 +75,8 @@ def check_draws():
 
     # if played draws exist
     if len(played_draws) != 0:
+        for d in played_draws:
+            d.view_draw(drawkey)
         return render_template('lottery.html', results=played_draws, played=True)
 
     # if no played draws exist [all draw entries have been played therefore wait for next lottery round]
