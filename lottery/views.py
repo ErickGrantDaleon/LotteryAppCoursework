@@ -13,6 +13,7 @@ lottery_blueprint = Blueprint('lottery', __name__, template_folder='templates')
 user = User.query.filter_by(id=1).first()
 drawkey = user.draw_key
 
+
 # VIEWS
 # view lottery page
 @lottery_blueprint.route('/lottery')
@@ -37,7 +38,8 @@ def add_draw():
     submitted_draw.strip()
 
     # create a new draw with the form data.
-    new_draw = Draw(user_id=1, draw=submitted_draw, win=False, round=0, draw_key=drawkey)  # TODO: update user_id [user_id=1 is a placeholder]
+    new_draw = Draw(user_id=1, draw=submitted_draw, win=False, round=0,
+                    draw_key=drawkey)  # TODO: update user_id [user_id=1 is a placeholder]
 
     # add the new draw to the database
     db.session.add(new_draw)
@@ -94,5 +96,3 @@ def play_again():
 
     flash("All played draws deleted.")
     return lottery()
-
-
