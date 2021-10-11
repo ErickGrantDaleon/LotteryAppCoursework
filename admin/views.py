@@ -71,6 +71,8 @@ def view_winning_draw():
     # if a winning draw exists
     if current_winning_draw:
         # re-render admin page with current winning draw and lottery round
+        current_winning_draw.view_draw(drawkey)
+
         return render_template('admin.html', winning_draw=current_winning_draw, name="PLACEHOLDER FOR FIRSTNAME")
 
     # if no winning draw exists, rerender admin page
