@@ -23,19 +23,28 @@ def lottery():
 @lottery_blueprint.route('/add_draw', methods=['POST'])
 def add_draw():
     submitted_draw = ''
+    empty_field = False
     for i in range(6):
-        submitted_draw += request.form.get('no' + str(i + 1)) + ' '
+        if request.form.get('no' + str(i + 1)) != '' and not empty_field:
+            submitted_draw += request.form.get('no' + str(i + 1)) + ' '
+        else:
+            empty_field = True
+
     submitted_draw.strip()
 
-    # create a new draw with the form data.
-    new_draw = Draw(user_id=1, draw=submitted_draw, win=False, round=0, draw_key=drawkey)  # TODO: update user_id [user_id=1 is a placeholder]
+    if not empty_field:
+        # create a new draw with the form data.
+        new_draw = Draw(user_id=1, draw=submitted_draw, win=False, round=0, draw_key=drawkey)  # TODO: update user_id [user_id=1 is a placeholder]
 
-    # add the new draw to the database
-    db.session.add(new_draw)
-    db.session.commit()
+        # add the new draw to the database
+        db.session.add(new_draw)
+        db.session.commit()
 
-    # re-render lottery.page
-    flash('Draw %s submitted.' % submitted_draw)
+        # re-render lottery.page
+        flash('Draw %s submitted.' % submitted_draw)
+    else:
+        flash('Must fill all slots.')
+
     return lottery()
 
 
