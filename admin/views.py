@@ -6,6 +6,10 @@ from models import User, Draw
 # CONFIG
 admin_blueprint = Blueprint('admin', __name__, template_folder='templates')
 
+# Temporary code to test user key.
+# TODO: Probably update this code when dealing with multiple users.
+admin = User.query.filter_by(id=2).first()
+drawkey = admin.draw_key
 
 # VIEWS
 # view admin homepage
@@ -46,7 +50,7 @@ def create_winning_draw():
     submitted_draw.strip()
 
     # create a new draw object with the form data.
-    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round)
+    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round, draw_key=drawkey)
 
     # add the new winning draw to the database
     db.session.add(new_winning_draw)
