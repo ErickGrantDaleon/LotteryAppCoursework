@@ -1,3 +1,4 @@
+"""Functions for user account-based actions"""
 # IMPORTS
 import logging
 from functools import wraps
@@ -25,7 +26,8 @@ def register():
         user = User.query.filter_by(email=form.email.data).first()
         # if this returns a user, then the email already exists in database
 
-        # if email already exists redirect user back to signup page with error message so user can try again
+        # if email already exists redirect user back to signup page with error
+        # message so user can try again
         if user:
             flash('Email address already exists')
             return render_template('register.html', form=form)

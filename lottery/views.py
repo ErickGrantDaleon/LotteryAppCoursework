@@ -1,3 +1,4 @@
+"""User functions for playing the lottery game"""
 # IMPORTS
 import logging
 
@@ -55,7 +56,8 @@ def add_draw():
 @lottery_blueprint.route('/view_draws', methods=['POST'])
 def view_draws():
     # get all draws that have not been played [played=0]
-    playable_draws = Draw.query.filter_by(played=False).all()  # TODO: filter playable draws for current user
+    playable_draws = Draw.query.filter_by(played=False).all()
+    # TODO: filter playable draws for current user
 
     # if playable draws exist
     if len(playable_draws) != 0:
@@ -73,13 +75,15 @@ def view_draws():
 @lottery_blueprint.route('/check_draws', methods=['POST'])
 def check_draws():
     # get played draws
-    played_draws = Draw.query.filter_by(played=True).all()  # TODO: filter played draws for current user
+    played_draws = Draw.query.filter_by(played=True).all()
+    # TODO: filter played draws for current user
 
     # if played draws exist
     if len(played_draws) != 0:
         for d in played_draws:
             d.view_draw(drawkey)
-        return render_template('lottery.html', results=played_draws, played=True)
+        return render_template('lottery.html', results=played_draws,
+                               played=True)
 
     # if no played draws exist [all draw entries have been played therefore wait for next lottery round]
     else:

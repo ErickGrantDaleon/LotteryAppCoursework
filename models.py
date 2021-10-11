@@ -1,19 +1,20 @@
+"""Contains main classes"""
 from datetime import datetime
 from flask_login import UserMixin
-from app import db
-from werkzeug.security import generate_password_hash
+from cryptography.fernet import Fernet
 import base64
 from Crypto.Protocol.KDF import scrypt
 from Crypto.Random import get_random_bytes
-from cryptography.fernet import Fernet
+from werkzeug.security import generate_password_hash
+from app import db
 
 
-def encrypt(data, postkey):
-    return Fernet(postkey).encrypt(bytes(data, 'utf-8'))
+def encrypt(data, drawkey):
+    return Fernet(drawkey).encrypt(bytes(data, 'utf-8'))
 
 
-def decrypt(data, postkey):
-    return Fernet(postkey).decrypt(data).decode("utf-8")
+def decrypt(data, drawkey):
+    return Fernet(drawkey).decrypt(data).decode("utf-8")
 
 
 class User(db.Model, UserMixin):
@@ -50,7 +51,8 @@ class User(db.Model, UserMixin):
         self.phone = phone
         self.password = generate_password_hash(password)
         self.pin_key = pin_key
-        self.draw_key = base64.urlsafe_b64encode(scrypt(password, str(get_random_bytes(32)), 32, N=2 ** 14, r=8, p=1))
+        self.draw_key = base64.urlsafe_b64encode(scrypt(password, str(get_random_bytes(32)),
+                                                        32, N=2 ** 14, r=8, p=1))
         self.role = role
         self.registered_on = datetime.now()
         self.last_logged_in = None

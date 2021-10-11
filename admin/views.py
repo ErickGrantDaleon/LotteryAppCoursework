@@ -1,3 +1,4 @@
+"""Admin functions for managing the lottery game"""
 # IMPORTS
 from flask import Blueprint, render_template, request, flash
 from app import db
@@ -59,7 +60,8 @@ def create_winning_draw():
     submitted_draw.strip()
 
     # create a new draw object with the form data.
-    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round_number, draw_key=drawkey)
+    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round_number,
+                            draw_key=drawkey)
 
     # add the new winning draw to the database
     db.session.add(new_winning_draw)
@@ -82,7 +84,8 @@ def view_winning_draw():
         # re-render admin page with current winning draw and lottery round
         current_winning_draw.view_draw(drawkey)
 
-        return render_template('admin.html', winning_draw=current_winning_draw, name="PLACEHOLDER FOR FIRSTNAME")
+        return render_template('admin.html', winning_draw=current_winning_draw,
+                               name="PLACEHOLDER FOR FIRSTNAME")
 
     # if no winning draw exists, rerender admin page
     flash("No winning draw exists. Please add winning draw.")
@@ -119,7 +122,8 @@ def run_lottery():
                 # if user draw matches current unplayed winning draw
                 if draw.draw == current_winning_draw.draw:
                     # add details of winner to list of results
-                    results.append((current_winning_draw.round, draw.draw, draw.user_id, user.email))
+                    results.append((current_winning_draw.round, draw.draw, draw.user_id,
+                                    user.email))
 
                     # update draw as a winning draw (this will be used to highlight winning draws in the user's
                     # lottery page)
