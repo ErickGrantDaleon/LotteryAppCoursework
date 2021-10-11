@@ -10,7 +10,7 @@ lottery_blueprint = Blueprint('lottery', __name__, template_folder='templates')
 
 # Temporary code to test user key.
 # TODO: Probably update this code when dealing with multiple users.
-user = User.query.filter_by(id=2).first()
+user = User.query.filter_by(id=1).first()
 drawkey = user.draw_key
 
 # VIEWS
@@ -48,6 +48,9 @@ def view_draws():
     # if playable draws exist
     if len(playable_draws) != 0:
         # re-render lottery page with playable draws
+        for d in playable_draws:
+            d.view_draw(drawkey)
+
         return render_template('lottery.html', playable_draws=playable_draws)
     else:
         flash('No playable draws.')

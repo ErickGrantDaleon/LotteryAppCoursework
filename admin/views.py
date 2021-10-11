@@ -8,7 +8,7 @@ admin_blueprint = Blueprint('admin', __name__, template_folder='templates')
 
 # Temporary code to test user key.
 # TODO: Probably update this code when dealing with multiple users.
-admin = User.query.filter_by(id=2).first()
+admin = User.query.filter_by(id=1).first()
 drawkey = admin.draw_key
 
 # VIEWS

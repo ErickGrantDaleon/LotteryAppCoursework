@@ -7,8 +7,13 @@ from Crypto.Protocol.KDF import scrypt
 from Crypto.Random import get_random_bytes
 from cryptography.fernet import Fernet
 
+
 def encrypt(data, postkey):
     return Fernet(postkey).encrypt(bytes(data, 'utf-8'))
+
+
+def decrypt(data, postkey):
+    return Fernet(postkey).decrypt(data).decode("utf-8")
 
 
 class User(db.Model, UserMixin):
@@ -70,6 +75,9 @@ class Draw(db.Model):
         self.match = False
         self.win = win
         self.round = round
+
+    def view_draw(self, draw_key):
+        self.draw = decrypt(self.draw, draw_key)
 
 
 def init_db():
