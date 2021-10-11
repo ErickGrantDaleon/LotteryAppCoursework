@@ -11,6 +11,7 @@ admin_blueprint = Blueprint('admin', __name__, template_folder='templates')
 admin = User.query.filter_by(id=1).first()
 drawkey = admin.draw_key
 
+
 # VIEWS
 # view admin homepage
 @admin_blueprint.route('/admin')
@@ -28,15 +29,14 @@ def view_all_users():
 # create a new winning draw
 @admin_blueprint.route('/create_winning_draw', methods=['POST'])
 def create_winning_draw():
-
     # get current winning draw
     current_winning_draw = Draw.query.filter_by(win=True).first()
-    round = 1
+    round_number = 1
 
     # if a current winning draw exists
     if current_winning_draw:
         # update lottery round by 1
-        round = current_winning_draw.round + 1
+        round_number = current_winning_draw.round + 1
 
         # delete current winning draw
         db.session.delete(current_winning_draw)
@@ -59,7 +59,7 @@ def create_winning_draw():
     submitted_draw.strip()
 
     # create a new draw object with the form data.
-    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round, draw_key=drawkey)
+    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round_number, draw_key=drawkey)
 
     # add the new winning draw to the database
     db.session.add(new_winning_draw)
@@ -74,7 +74,6 @@ def create_winning_draw():
 # view current winning draw
 @admin_blueprint.route('/view_winning_draw', methods=['POST'])
 def view_winning_draw():
-
     # get winning draw from DB
     current_winning_draw = Draw.query.filter_by(win=True).first()
 
@@ -93,7 +92,6 @@ def view_winning_draw():
 # view lottery results and winners
 @admin_blueprint.route('/run_lottery', methods=['POST'])
 def run_lottery():
-
     # get current unplayed winning draw
     current_winning_draw = Draw.query.filter_by(win=True, played=False).first()
 
@@ -120,7 +118,6 @@ def run_lottery():
 
                 # if user draw matches current unplayed winning draw
                 if draw.draw == current_winning_draw.draw:
-
                     # add details of winner to list of results
                     results.append((current_winning_draw.round, draw.draw, draw.user_id, user.email))
 
