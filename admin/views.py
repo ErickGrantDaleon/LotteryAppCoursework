@@ -44,20 +44,29 @@ def create_winning_draw():
 
     # get new winning draw entered in form
     submitted_draw = ''
+    empty_field = False
     for i in range(6):
-        submitted_draw += request.form.get('no' + str(i + 1)) + ' '
+        if request.form.get('no' + str(i + 1)) != '' and not empty_field:
+            submitted_draw += request.form.get('no' + str(i + 1)) + ' '
+        else:
+            empty_field = True
+
     # remove any surrounding whitespace
     submitted_draw.strip()
 
-    # create a new draw object with the form data.
-    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round, draw_key=drawkey)
+    if not empty_field:
+        # create a new draw object with the form data.
+        new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round, draw_key=drawkey)
 
-    # add the new winning draw to the database
-    db.session.add(new_winning_draw)
-    db.session.commit()
+        # add the new winning draw to the database
+        db.session.add(new_winning_draw)
+        db.session.commit()
 
-    # re-render admin page
-    flash("New winning draw added.")
+        # re-render admin page
+        flash("New winning draw added.")
+    else:
+        flash('Must fill all slots.')
+
     return admin()
 
 
