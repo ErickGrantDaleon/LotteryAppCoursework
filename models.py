@@ -2,7 +2,9 @@ from datetime import datetime
 from flask_login import UserMixin
 from app import db
 from werkzeug.security import generate_password_hash
-
+import base64
+from Crypto.Protocol.KDF import scrypt
+from Crypto.Random import get_random_bytes
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -25,7 +27,7 @@ class User(db.Model, UserMixin):
     phone = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100), nullable=False, default='user')
 
-    # crypto key for user's lottery draws
+    # Crypto key for user's lottery draws
     draw_key = db.Column(db.BLOB)
 
     # Define the relationship to Draw
@@ -38,7 +40,7 @@ class User(db.Model, UserMixin):
         self.phone = phone
         self.password = generate_password_hash(password)
         self.pin_key = pin_key
-        self.draw_key = None
+        self.draw_key = base64.urlsafe_b64encode(scrypt(password, str(get_random_bytes(32)), 32, N=2 ** 14, r=8, p=1))
         self.role = role
         self.registered_on = datetime.now()
         self.last_logged_in = None
