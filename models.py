@@ -41,6 +41,11 @@ class User(db.Model, UserMixin):
     # Crypto key for user's lottery draws
     draw_key = db.Column(db.BLOB)
 
+    # Login Data
+    registered_on = db.Column(db.DateTime, nullable=False)
+    last_logged_in = db.Column(db.DateTime, nullable=True)
+    current_logged_in = db.Column(db.DateTime, nullable=True)
+
     # Define the relationship to Draw
     draws = db.relationship('Draw')
 
