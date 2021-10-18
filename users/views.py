@@ -3,7 +3,7 @@
 import logging
 from functools import wraps
 from datetime import datetime
-from flask import Blueprint, render_template, flash, redirect, url_for, request
+from flask import Blueprint, render_template, flash, redirect, url_for, request, session
 from flask_login import current_user
 from werkzeug.security import check_password_hash
 from flask_login import login_user, logout_user
@@ -20,6 +20,7 @@ users_blueprint = Blueprint('users', __name__, template_folder='templates')
 # view registration
 @users_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
+
     # create signup form object
     form = RegisterForm()
 
@@ -56,17 +57,32 @@ def register():
 # view user login
 @users_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
+
+    # create attribute logins if session attribute logins does not exist
+    if not session.get('logins'):
+        session['logins'] = 0
+    # create an error message if login attempts is 3 or more
+    elif session.get('logins') >= 3:
+        flash('Number of incorrect logins exceeded')
+
     form = LoginForm()
 
     if form.validate_on_submit():
 
+        session['logins'] += 1
         user = User.query.filter_by(email=form.email.data).first()
 
         if not user or not check_password_hash(user.password, form.password.data):
-            flash('Please check your login details and try again')
+            if session['logins'] >= 3:
+                flash('Number of incorrect logins exceeded.')
+            elif session['logins'] == 3 - 1:
+                flash('Login details incorrect. 1 login attempt remaining.')
+            else:
+                flash('Login details incorrect. ' + str(3 - session['logins']) + ' login attempts remaining.')
             return render_template('login.html', form=form)
 
         if pyotp.TOTP(user.pin_key).verify(form.pin.data):
+            session['logins'] = 0
             login_user(user)
             user.last_logged_in = user.current_logged_in
             user.current_logged_in = datetime.now()
