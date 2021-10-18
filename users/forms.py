@@ -39,7 +39,7 @@ class RegisterForm(FlaskForm):
     confirm_password = PasswordField(validators=[Required(),
                                                  EqualTo('password', message='Both password fields '
                                                                              'must be equal.')])
-    pin_key = StringField(validators=[Required(),
+    pin_key = StringField(validators=[Required(), character_check,
                                       Length(min=32, max=32, message='Pin key must be '
                                                                      '32 characters long.'), base32_check])
     submit = SubmitField()
