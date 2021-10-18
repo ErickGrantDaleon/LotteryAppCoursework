@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import Required, Email, ValidationError, Length, EqualTo
 import re
+import base64
 
 
 def character_check(form, field):
@@ -20,6 +21,13 @@ def phone_check(form, field):
             raise ValidationError("Phone must be of the form XXXX-XXX-XXXX.")
 
 
+def base32_check(form, field):
+    try:
+        base64.b32decode(field.data, casefold=True)
+    except:
+        raise ValidationError("Invalid pin key (Key must be in base32).")
+
+
 class RegisterForm(FlaskForm):
     email = StringField(validators=[Required(), Email()])
     firstname = StringField(validators=[Required(), character_check])
@@ -33,7 +41,7 @@ class RegisterForm(FlaskForm):
                                                                              'must be equal.')])
     pin_key = StringField(validators=[Required(),
                                       Length(min=32, max=32, message='Pin key must be '
-                                                                     '32 characters long.')])
+                                                                     '32 characters long.'), base32_check])
     submit = SubmitField()
 
     def validate_password(self, password):
