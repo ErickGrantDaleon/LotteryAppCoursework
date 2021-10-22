@@ -1,5 +1,6 @@
 """Admin functions for managing the lottery game"""
 # IMPORTS
+import copy
 from flask import Blueprint, render_template, request, flash
 from app import db
 from models import User, Draw
@@ -80,13 +81,13 @@ def create_winning_draw():
 def view_winning_draw():
     # get winning draw from DB
     current_winning_draw = Draw.query.filter_by(win=True).first()
-
+    draw_copy = copy.deepcopy(current_winning_draw)
     # if a winning draw exists
-    if current_winning_draw:
+    if draw_copy:
         # re-render admin page with current winning draw and lottery round
-        current_winning_draw.view_draw(drawkey)
+        draw_copy.view_draw(drawkey)
 
-        return render_template('admin.html', winning_draw=current_winning_draw,
+        return render_template('admin.html', winning_draw=draw_copy,
                                name="PLACEHOLDER FOR FIRSTNAME")
 
     # if no winning draw exists, rerender admin page
