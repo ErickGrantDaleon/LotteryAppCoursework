@@ -3,6 +3,7 @@
 from flask import Blueprint, render_template, request, flash
 from app import db
 from models import User, Draw
+from flask_login import login_user, logout_user, login_required
 
 # CONFIG
 admin_blueprint = Blueprint('admin', __name__, template_folder='templates')
@@ -16,6 +17,7 @@ drawkey = admin.draw_key
 # VIEWS
 # view admin homepage
 @admin_blueprint.route('/admin')
+@login_required
 def admin():
     return render_template('admin.html', name="PLACEHOLDER FOR FIRSTNAME")
 
