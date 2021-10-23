@@ -2,11 +2,12 @@
 # IMPORTS
 import logging
 from functools import wraps
+import logging
 from datetime import datetime
 from flask import Blueprint, render_template, flash, redirect, url_for, request, session
 from flask_login import current_user
 from werkzeug.security import check_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from models import User
 from users.forms import RegisterForm, LoginForm
@@ -47,7 +48,7 @@ def register():
         # add the new user to the database
         db.session.add(new_user)
         db.session.commit()
-
+        logging.warning('SECURITY - User registration [%s, %s]', form.email.data, request.remote_addr)
         # sends user to login page
         return redirect(url_for('users.login'))
     # if request method is GET or form not valid re-render signup page
@@ -79,6 +80,8 @@ def login():
                 flash('Login details incorrect. 1 login attempt remaining.')
             else:
                 flash('Login details incorrect. ' + str(3 - session['logins']) + ' login attempts remaining.')
+            logging.warning('SECURITY - User log in fail attempt ' + str(session['logins']) +
+                            ' [%s, %s]', form.email.data, request.remote_addr)
             return render_template('login.html', form=form)
 
         if pyotp.TOTP(user.pin_key).verify(form.pin.data):
@@ -88,18 +91,23 @@ def login():
             user.current_logged_in = datetime.now()
             db.session.add(user)
             db.session.commit()
+            logging.warning('SECURITY - User log in [%s, %s, %s]', current_user.id,
+                            form.email.data, request.remote_addr)
+            return profile()
 
         else:
             flash("You have supplied an invalid 2FA token!", "danger")
+            logging.warning('SECURITY - User log in fail (2FA) [%s, %s]', form.email.data,
+                            request.remote_addr)
             return render_template('login.html', form=form)
 
-        return profile()
     return render_template('login.html', form=form)
 
 
 @users_blueprint.route('/logout')
 @login_required
 def logout():
+    logging.warning('SECURITY - User log out [%s, %s, %s]', current_user.id, current_user.email, request.remote_addr)
     logout_user()
     return redirect(url_for('index'))
 

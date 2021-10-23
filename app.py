@@ -1,11 +1,30 @@
 """Main Module of Lottery App"""
 # IMPORTS
+import logging
 import socket
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
-# CONFIG
+
+# TODO: FIX DUPLICATE LOGGING ENTRIES
+# logging
+class SecurityFilter(logging.Filter):
+    def filter(self, record):
+        return "SECURITY" in record.getMessage()
+
+
+fh = logging.FileHandler('lottery.log', mode='a')
+fh.setLevel(logging.WARNING)
+fh.addFilter(SecurityFilter())
+formatter = logging.Formatter('%(asctime)s : %(message)s', '%m/%d/%Y %I:%M:%S %p')
+fh.setFormatter(formatter)
+
+logger = logging.getLogger('')
+logger.propagate = False
+logger.addHandler(fh)
+
+# config
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lottery.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -23,12 +42,13 @@ def index():
 
 # ERROR PAGE VIEWS
 @app.errorhandler(400)  # Bad Request
-def page_forbidden(error):
+def bad_request(error):
     return render_template('400.html'), 400
 
 
 @app.errorhandler(403)  # Forbidden
 def page_forbidden(error):
+    logging.warning('SECURITY - Forbidden page access attempt [%s]', request.remote_addr)
     return render_template('403.html'), 403
 
 
@@ -43,7 +63,7 @@ def internal_error(error):
 
 
 @app.errorhandler(503)  # Service Unavailable
-def internal_error(error):
+def service_unavailable(error):
     return render_template('503.html'), 503
 
 
@@ -61,6 +81,7 @@ if __name__ == "__main__":
     login_manager.init_app(app)
 
     from models import User
+
 
     @login_manager.user_loader
     def load_user(id):
