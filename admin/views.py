@@ -19,13 +19,13 @@ admin_draw_key = user_admin.draw_key
 @admin_blueprint.route('/admin')
 @login_required
 def admin():
-    return render_template('admin.html', name="PLACEHOLDER FOR FIRSTNAME")
+    return render_template('admin.html', name=user_admin.firstname)
 
 
 # view all registered users
 @admin_blueprint.route('/view_all_users', methods=['POST'])
 def view_all_users():
-    return render_template('admin.html', name="PLACEHOLDER FOR FIRSTNAME",
+    return render_template('admin.html', name=user_admin.firstname,
                            current_users=User.query.filter_by(role='user').all())
 
 
@@ -88,7 +88,7 @@ def view_winning_draw():
         draw_copy.view_draw(admin_draw_key)
 
         return render_template('admin.html', winning_draw=draw_copy,
-                               name="PLACEHOLDER FOR FIRSTNAME")
+                               name=user_admin.firstname)
 
     # if no winning draw exists, rerender admin page
     flash("No winning draw exists. Please add winning draw.")
@@ -126,7 +126,7 @@ def run_lottery():
                 # if user draw matches current unplayed winning draw
                 if draw.get_draw(user.draw_key) == current_winning_draw.get_draw(admin_draw_key):
                     # add details of winner to list of results
-                    results.append((current_winning_draw.round, draw.draw, draw.user_id,
+                    results.append((current_winning_draw.round, draw.get_draw(user.draw_key), draw.user_id,
                                     user.email))
 
                     # update draw as a winning draw (this will be used to highlight winning draws in the user's
@@ -146,7 +146,7 @@ def run_lottery():
             if len(results) == 0:
                 flash("No winners.")
 
-            return render_template('admin.html', results=results, name="PLACEHOLDER FOR FIRSTNAME")
+            return render_template('admin.html', results=results, name=user_admin.firstname)
 
         flash("No user draws entered.")
         return admin()
@@ -163,4 +163,4 @@ def logs():
         content = f.read().splitlines()[-10:]
         content.reverse()
 
-    return render_template('admin.html', logs=content, name="PLACEHOLDER FOR FIRSTNAME")
+    return render_template('admin.html', logs=content, name=user_admin.firstname)
