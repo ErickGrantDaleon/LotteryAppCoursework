@@ -86,6 +86,9 @@ class Draw(db.Model):
     def view_draw(self, draw_key):
         self.draw = decrypt(self.draw, draw_key)
 
+    def get_draw(self, draw_key):
+        return decrypt(self.draw, draw_key)
+
 
 def init_db():
     db.drop_all()

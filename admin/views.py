@@ -4,16 +4,15 @@ import copy
 from flask import Blueprint, render_template, request, flash
 from app import db
 from models import User, Draw
-from flask_login import login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
 # CONFIG
 admin_blueprint = Blueprint('admin', __name__, template_folder='templates')
 
-# Temporary code to test user key.
-# TODO: Probably update this code when dealing with multiple users.
-admin = User.query.filter_by(id=1).first()
-drawkey = admin.draw_key
-
+# gets the admins draw key to encrypt the winning draw. Should probably update this if you want
+# multiple admins.
+user_admin = User.query.filter_by(id=1).first()
+admin_draw_key = user_admin.draw_key
 
 # VIEWS
 # view admin homepage
@@ -33,6 +32,7 @@ def view_all_users():
 # create a new winning draw
 @admin_blueprint.route('/create_winning_draw', methods=['POST'])
 def create_winning_draw():
+
     # get current winning draw
     current_winning_draw = Draw.query.filter_by(win=True).first()
     round_number = 1
@@ -64,7 +64,7 @@ def create_winning_draw():
 
     # create a new draw object with the form data.
     new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round_number,
-                            draw_key=drawkey)
+                            draw_key=admin_draw_key)
 
     # add the new winning draw to the database
     db.session.add(new_winning_draw)
@@ -85,7 +85,7 @@ def view_winning_draw():
     # if a winning draw exists
     if draw_copy:
         # re-render admin page with current winning draw and lottery round
-        draw_copy.view_draw(drawkey)
+        draw_copy.view_draw(admin_draw_key)
 
         return render_template('admin.html', winning_draw=draw_copy,
                                name="PLACEHOLDER FOR FIRSTNAME")
@@ -116,6 +116,7 @@ def run_lottery():
             db.session.add(current_winning_draw)
             db.session.commit()
 
+            admin_user = User.query.filter_by(role="admin").first()
             # for each unplayed user draw
             for draw in user_draws:
 
@@ -123,7 +124,7 @@ def run_lottery():
                 user = User.query.filter_by(id=draw.user_id).first()
 
                 # if user draw matches current unplayed winning draw
-                if draw.draw == current_winning_draw.draw:
+                if draw.get_draw(user.draw_key) == current_winning_draw.get_draw(admin_draw_key):
                     # add details of winner to list of results
                     results.append((current_winning_draw.round, draw.draw, draw.user_id,
                                     user.email))
@@ -137,7 +138,6 @@ def run_lottery():
 
                 # update draw with current lottery round
                 draw.round = current_winning_draw.round
-
                 # commit draw changes to DB
                 db.session.add(draw)
                 db.session.commit()
