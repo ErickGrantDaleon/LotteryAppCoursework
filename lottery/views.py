@@ -40,6 +40,7 @@ def add_draw():
     new_draw = Draw(user_id=current_user.id, draw=submitted_draw, win=False, round=0, draw_key=current_user.draw_key)
 
     # add the new draw to the database
+    db.session.expunge_all()
     db.session.add(new_draw)
     try:
         db.session.commit()
@@ -60,19 +61,24 @@ def add_draw():
 def view_draws():
     # get all draws that have not been played [played=0]
     playable_draws = Draw.query.filter_by(played=False).all()
-    draw_copies = list(map(lambda x: copy.deepcopy(x), playable_draws))
+    draw_copies_playable = list(map(lambda x: copy.deepcopy(x), playable_draws))
     decrypted_draws = []
 
     # if playable draws exist
-    if len(draw_copies) != 0:
+    if len(draw_copies_playable) != 0:
         # re-render lottery page with playable draws
-        for d in draw_copies:
+        for d in draw_copies_playable:
             user = User.query.filter_by(id=d.user_id).first()
-            if not (user is None):
+            if not (user is None) and user.id == current_user.id:
                 d.view_draw(user.draw_key)
                 decrypted_draws.append(d)
 
-        return render_template('lottery.html', playable_draws=decrypted_draws)
+        # if playable draws that match the current user's id exist
+        if len(decrypted_draws) != 0:
+            return render_template('lottery.html', playable_draws=decrypted_draws)
+        else:
+            flash('No playable draws.')
+            return lottery()
     else:
         flash('No playable draws.')
         return lottery()
@@ -84,18 +90,24 @@ def view_draws():
 def check_draws():
     # get played draws
     played_draws = Draw.query.filter_by(played=True).all()
-    draw_copies = list(map(lambda x: copy.deepcopy(x), played_draws))
+    draw_copies_played = list(map(lambda x: copy.deepcopy(x), played_draws))
     decrypted_draws = []
 
     # if played draws exist
-    if len(draw_copies) != 0:
-        for d in draw_copies:
+    if len(draw_copies_played) != 0:
+        for d in draw_copies_played:
             user = User.query.filter_by(id=d.user_id).first()
-            if not (user is None):
+            if not (user is None) and user.id == current_user.id:
                 d.view_draw(user.draw_key)
                 decrypted_draws.append(d)
-        return render_template('lottery.html', results=decrypted_draws,
-                               played=True)
+
+        # if played draws that match the current user's id exist
+        if len(decrypted_draws) != 0:
+            return render_template('lottery.html', results=decrypted_draws,
+                                   played=True)
+        else:
+            flash("Next round of lottery yet to play. Check you have playable draws.")
+            return lottery()
 
     # if no played draws exist [all draw entries have been played therefore wait for next lottery round]
     else:
