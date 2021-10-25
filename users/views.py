@@ -12,6 +12,7 @@ from app import db
 from models import User
 from users.forms import RegisterForm, LoginForm
 import pyotp
+from admin.views import admin
 
 # CONFIG
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
@@ -93,7 +94,10 @@ def login():
             db.session.commit()
             logging.warning('SECURITY - User log in [%s, %s, %s]', current_user.id,
                             form.email.data, request.remote_addr)
-            return profile()
+            if current_user.role == 'admin':
+                return admin()
+            else:
+                return profile()
 
         else:
             flash("You have supplied an invalid 2FA token!", "danger")
