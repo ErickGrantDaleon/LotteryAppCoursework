@@ -2,10 +2,10 @@
 # IMPORTS
 import logging
 import socket
+from functools import wraps
 from flask import Flask, render_template, request
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_sqlalchemy import SQLAlchemy
-
 
 # TODO: FIX DUPLICATE LOGGING ENTRIES
 
@@ -20,7 +20,27 @@ app.config['SECRET_KEY'] = 'LongAndRandomSecretKey'
 db = SQLAlchemy(app)
 
 
-# HOME PAGE VIEW
+# role-based access
+def requires_roles(*roles):
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if current_user.role not in roles:
+                logging.warning('SECURITY - Unauthorised access attempt [%s, %s, %s, %s]',
+                                current_user.id,
+                                current_user.email,
+                                current_user.role,
+                                request.remote_addr)
+                # redirect to 403
+                return render_template('403.html')
+            return f(*args, **kwargs)
+
+        return wrapped
+
+    return wrapper
+
+
+# home page view
 @app.route('/')
 def index():
     return render_template('index.html')
