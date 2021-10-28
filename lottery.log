@@ -11,3 +11,4 @@
 10/25/2021 01:19:41 PM : SECURITY - User log in [1, admin@email.com, 127.0.0.1]
 10/25/2021 01:22:12 PM : SECURITY - Unauthorised access attempt [1, admin@email.com, admin, 127.0.0.1]
 10/25/2021 01:22:21 PM : SECURITY - User log out [1, admin@email.com, 127.0.0.1]
+10/28/2021 03:34:03 AM : SECURITY - User log in [2, a@a.a, 127.0.0.1]

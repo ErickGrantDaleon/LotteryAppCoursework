@@ -27,14 +27,7 @@ def add_draw():
     submitted_draw = ''
     for i in range(6):
         strip_number = request.form.get('no' + str(i + 1))
-        if strip_number != '':
-            if not 1 <= int(strip_number) <= 60:
-                flash('Slots must be between 1 and 60')
-                return lottery()
-            submitted_draw += strip_number + ' '
-        else:
-            flash('Must fill all slots.')
-            return lottery()
+        submitted_draw += strip_number + ' '
 
     submitted_draw.strip()
 
