@@ -18,3 +18,5 @@
 10/31/2021 05:34:27 AM : SECURITY - User log in [2, a@a.a, 127.0.0.1]
 10/31/2021 05:37:21 AM : SECURITY - User log out [2, a@a.a, 127.0.0.1]
 10/31/2021 05:37:38 AM : SECURITY - User log in [1, admin@email.com, 127.0.0.1]
+11/01/2021 12:42:10 AM : SECURITY - User log in [2, a@a.a, 127.0.0.1]
+11/02/2021 05:13:29 AM : SECURITY - User log in [2, a@a.a, 127.0.0.1]
