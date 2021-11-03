@@ -4,7 +4,7 @@ import copy
 from flask import Blueprint, render_template, request, flash
 from app import db, requires_roles
 from models import User, Draw
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_required
 
 # CONFIG
 admin_blueprint = Blueprint('admin', __name__, template_folder='templates')
@@ -56,14 +56,7 @@ def create_winning_draw():
     submitted_draw = ''
     for i in range(6):
         strip_number = request.form.get('no' + str(i + 1))
-        if strip_number != '':
-            if not 1 <= int(strip_number) <= 60:
-                flash('Slots must be between 1 and 60')
-                return admin()
-            submitted_draw += strip_number + ' '
-        else:
-            flash('Must fill all slots.')
-            return admin()
+        submitted_draw += strip_number + ' '
 
     # remove any surrounding whitespace
     submitted_draw.strip()
