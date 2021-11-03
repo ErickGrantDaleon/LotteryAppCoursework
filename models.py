@@ -105,5 +105,4 @@ def init_db():
                  role='admin')
 
     db.session.add(admin)
-    db.session.add(user1)
     db.session.commit()

@@ -1,8 +1,6 @@
 """Functions for user account-based actions"""
 # IMPORTS
 import logging
-from functools import wraps
-import logging
 from datetime import datetime
 from flask import Blueprint, render_template, flash, redirect, url_for, request, session
 from werkzeug.security import check_password_hash

@@ -60,4 +60,3 @@ class LoginForm(FlaskForm):
     password = PasswordField(validators=[Required()])
     pin = StringField(validators=[Required()])
     submit = SubmitField()
-
