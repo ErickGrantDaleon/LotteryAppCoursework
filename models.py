@@ -1,4 +1,5 @@
 """Contains main classes"""
+# IMPORTS
 from datetime import datetime
 from flask_login import UserMixin
 from cryptography.fernet import Fernet
@@ -9,10 +10,12 @@ from werkzeug.security import generate_password_hash
 from app import db
 
 
+# encrypt draws
 def encrypt(data, drawkey):
     return Fernet(drawkey).encrypt(bytes(data, 'utf-8'))
 
 
+# decrypt draws
 def decrypt(data, drawkey):
     return Fernet(drawkey).decrypt(data).decode("utf-8")
 
@@ -22,31 +25,31 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    # User authentication information.
+    # user authentication information.
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
     pin_key = db.Column(db.String(100), nullable=False)
 
-    # User activity information
+    # user activity information
     registered_on = db.Column(db.DateTime, nullable=True)
     last_logged_in = db.Column(db.DateTime, nullable=True)
     current_logged_in = db.Column(db.DateTime, nullable=True)
 
-    # User information
+    # user information
     firstname = db.Column(db.String(100), nullable=False)
     lastname = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100), nullable=False, default='user')
 
-    # Crypto key for user's lottery draws
+    # crypto key for user's lottery draws
     draw_key = db.Column(db.BLOB)
 
-    # Login Data
+    # login data
     registered_on = db.Column(db.DateTime, nullable=False)
     last_logged_in = db.Column(db.DateTime, nullable=True)
     current_logged_in = db.Column(db.DateTime, nullable=True)
 
-    # Define the relationship to Draw
+    # define the relationship to Draw
     draws = db.relationship('Draw')
 
     def __init__(self, email, firstname, lastname, phone, password, pin_key, role):
@@ -100,14 +103,6 @@ def init_db():
                  lastname='Jones',
                  phone='0191-123-4567',
                  role='admin')
-
-    user1 = User(email='a@a.a',
-                 password='aaaaaA1!',
-                 pin_key='ILWXQ4WF2J6MHGPPKAF3RG4KENQGC6ZF',
-                 firstname='a',
-                 lastname='a',
-                 phone='1111-111-1111',
-                 role='user')
 
     db.session.add(admin)
     db.session.add(user1)

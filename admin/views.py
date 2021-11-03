@@ -71,7 +71,6 @@ def create_winning_draw():
 
     # re-render admin page
     flash("New winning draw added.")
-
     return admin()
 
 
@@ -85,9 +84,10 @@ def view_winning_draw():
     draw_copy = copy.deepcopy(current_winning_draw)
     # if a winning draw exists
     if draw_copy:
-        # re-render admin page with current winning draw and lottery round
+        # decrypt draw using the admin draw key
         draw_copy.view_draw(admin_draw_key)
 
+        # re-render admin page with current winning draw and lottery round
         return render_template('admin.html', winning_draw=draw_copy,
                                name=user_admin.firstname)
 
@@ -119,7 +119,6 @@ def run_lottery():
             db.session.add(current_winning_draw)
             db.session.commit()
 
-            admin_user = User.query.filter_by(role="admin").first()
             # for each unplayed user draw
             for draw in user_draws:
 

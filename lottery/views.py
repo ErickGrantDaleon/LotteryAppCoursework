@@ -1,6 +1,5 @@
 """User functions for playing the lottery game"""
 # IMPORTS
-import logging
 import copy
 from flask import Blueprint, render_template, request, flash
 from app import db, requires_roles
@@ -11,7 +10,6 @@ from flask_login import login_required, current_user
 lottery_blueprint = Blueprint('lottery', __name__, template_folder='templates')
 
 
-# VIEWS
 # view lottery page
 @lottery_blueprint.route('/lottery')
 @login_required
@@ -20,15 +18,18 @@ def lottery():
     return render_template('lottery.html')
 
 
+# create new draw for user
 @lottery_blueprint.route('/add_draw', methods=['POST'])
 @login_required
 @requires_roles('user')
 def add_draw():
+    # get new draw in submitted form
     submitted_draw = ''
     for i in range(6):
         strip_number = request.form.get('no' + str(i + 1))
         submitted_draw += strip_number + ' '
 
+    # remove any surrounding whitespace
     submitted_draw.strip()
 
     # create a new draw with the form data.
@@ -41,6 +42,7 @@ def add_draw():
         db.session.commit()
         flash('Draw %s submitted.' % submitted_draw)
     except:
+        # rollback if submission fails
         flash('Draw submission failed.')
         db.session.rollback()
     finally:
@@ -64,6 +66,7 @@ def view_draws():
     if len(draw_copies_playable) != 0:
         # re-render lottery page with playable draws
         for d in draw_copies_playable:
+            # decrypt draws
             user = User.query.filter_by(id=d.user_id).first()
             if not (user is None) and user.id == current_user.id:
                 d.view_draw(user.draw_key)
@@ -112,7 +115,7 @@ def check_draws():
         return lottery()
 
 
-# delete all played draws
+# delete all played draws for current user
 @lottery_blueprint.route('/play_again', methods=['POST'])
 @login_required
 @requires_roles('user')

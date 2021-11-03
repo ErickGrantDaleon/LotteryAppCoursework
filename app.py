@@ -51,6 +51,7 @@ def requires_roles(*roles):
     return wrapper
 
 
+# prevent logged in user access
 def login_prevent():
     def wrapper(f):
         @wraps(f)
@@ -131,11 +132,10 @@ if __name__ == "__main__":
 
 
     @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
 
-    # BLUEPRINTS
     # import blueprints
     from users.views import users_blueprint
     from admin.views import admin_blueprint

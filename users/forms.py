@@ -6,6 +6,7 @@ import re
 import base64
 
 
+# check if input does not have special characters
 def character_check(form, field):
     excluded_chars = "*?!'^+%&/()=}][{$#@<>"
     for char in field.data:
@@ -13,6 +14,7 @@ def character_check(form, field):
             raise ValidationError(f"Character {char} is not allowed.")
 
 
+# check if input matches phone format
 def phone_check(form, field):
     if len(field.data) != 13:
         raise ValidationError("Phone must be of the form XXXX-XXX-XXXX.")
@@ -21,6 +23,7 @@ def phone_check(form, field):
             raise ValidationError("Phone must be of the form XXXX-XXX-XXXX.")
 
 
+# check if input is base32
 def base32_check(form, field):
     try:
         base64.b32decode(field.data, casefold=True)
@@ -44,6 +47,7 @@ class RegisterForm(FlaskForm):
                                                                      '32 characters long.'), base32_check])
     submit = SubmitField()
 
+    # check if password meets correct criteria
     def validate_password(self, password):
         p = re.compile(r'(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9\s])')
         if not p.match(self.password.data):
