@@ -30,6 +30,7 @@ csp = {
 }
 talisman = Talisman(app, content_security_policy=csp)
 
+
 # role-based access
 def requires_roles(*roles):
     def wrapper(f):
@@ -41,6 +42,20 @@ def requires_roles(*roles):
                                 current_user.email,
                                 current_user.role,
                                 request.remote_addr)
+                # redirect to 403
+                return render_template('403.html')
+            return f(*args, **kwargs)
+
+        return wrapped
+
+    return wrapper
+
+
+def login_prevent():
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if current_user.is_authenticated:
                 # redirect to 403
                 return render_template('403.html')
             return f(*args, **kwargs)

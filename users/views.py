@@ -5,10 +5,9 @@ from functools import wraps
 import logging
 from datetime import datetime
 from flask import Blueprint, render_template, flash, redirect, url_for, request, session
-from flask_login import current_user
 from werkzeug.security import check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
-from app import db, requires_roles
+from app import db, requires_roles, login_prevent
 from models import User
 from users.forms import RegisterForm, LoginForm
 import pyotp
@@ -18,9 +17,9 @@ from admin.views import admin
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
 
 
-# VIEWS
 # view registration
 @users_blueprint.route('/register', methods=['GET', 'POST'])
+@login_prevent()
 def register():
 
     # create signup form object
@@ -34,7 +33,7 @@ def register():
         # if email already exists redirect user back to signup page with error
         # message so user can try again
         if user:
-            flash('Email address already exists')
+            flash('Email address already exists.')
             return render_template('register.html', form=form)
 
         # create a new user with the form data
@@ -58,6 +57,7 @@ def register():
 
 # view user login
 @users_blueprint.route('/login', methods=['GET', 'POST'])
+@login_prevent()
 def login():
 
     # create attribute logins if session attribute logins does not exist
